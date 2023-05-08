@@ -129,6 +129,28 @@ If you want to use S3 storage, the following properties need to be set.
 "AWS_CREDENTIALS_PROVIDER" = "provider-class-name" // Optional. The default credentials class is based on BasicAWSCredentials.
 ```
 
+#### Google Dataproc Metastore 作为元数据服务
+
+```sql
+CREATE CATALOG glue PROPERTIES (
+"type"="iceberg",
+"warehouse" = "gs://bucket/warehouse",
+"iceberg.catalog.type"="hms",
+"hive.metastore.uris" = "thrift://172.21.0.1:9083",
+"AWS_ENDPOINT" = "https://storage.googleapis.com",
+"AWS_REGION" = "us-east-1",
+"AWS_ACCESS_KEY" = "ak",
+"AWS_SECRET_KEY" = "sk",
+"use_path_style" = "true"
+);
+```
+
+`hive.metastore.uris`: Dataproc Metastore URI，See in Metastore Services ：[Dataproc Metastore Services](https://console.cloud.google.com/dataproc/metastore).
+
+`warehouse`:  Dataproc Metastore Location.  To determine the root path of the data warehouse in storage. Equal to the attribute `hive.metastore.warehouse.dir` in the Dataproc configuration。
+
+The other properties can refer to [Dataproc Metastore Docs](https://cloud.google.com/dataproc-metastore/docs/hive-metastore)
+
 ## Column Type Mapping
 
 Same as that in Hive Catalogs. See the relevant section in [Hive](./hive.md).

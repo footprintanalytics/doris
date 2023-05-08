@@ -26,6 +26,7 @@ import org.apache.doris.catalog.external.HMSExternalTable;
 import org.apache.doris.catalog.external.IcebergExternalTable;
 import org.apache.doris.common.AnalysisException;
 import org.apache.doris.common.DdlException;
+import org.apache.doris.common.FeConstants;
 import org.apache.doris.common.UserException;
 import org.apache.doris.common.util.TimeUtils;
 import org.apache.doris.datasource.iceberg.IcebergExternalCatalog;
@@ -185,7 +186,10 @@ public class IcebergScanNode extends FileQueryScanNode {
             long fileSize = task.file().fileSizeInBytes();
             for (FileScanTask splitTask : task.split(splitSize)) {
                 String dataFilePath = splitTask.file().path().toString();
-                IcebergSplit split = new IcebergSplit(new Path(dataFilePath), splitTask.start(),
+                // BE 无法识别 gs:// 开头的 file path，需要转换为 s3
+                // 为什么其他对象存储不需要转换？ 例如 oss
+                String finalDataFilePath = convertToS3IfNecessary(dataFilePath);
+                IcebergSplit split = new IcebergSplit(new Path(finalDataFilePath), splitTask.start(),
                         splitTask.length(), fileSize, new String[0]);
                 split.setFormatVersion(formatVersion);
                 if (formatVersion >= MIN_DELETE_FILE_SUPPORT_VERSION) {
@@ -196,6 +200,18 @@ public class IcebergScanNode extends FileQueryScanNode {
             }
         }
         return splits;
+    }
+
+    private String convertToS3IfNecessary(String location) {
+        // LOG.debug("try to convert location to s3 prefix: " + location);
+        if (location.startsWith(FeConstants.FS_PREFIX_GCS)) {
+            int pos = location.indexOf("://");
+            if (pos == -1) {
+                throw new RuntimeException("No '://' found in location: " + location);
+            }
+            return "s3" + location.substring(pos);
+        }
+        return location;
     }
 
     private long getSnapshotIdAsOfTime(List<HistoryEntry> historyEntries, long asOfTimestamp) {

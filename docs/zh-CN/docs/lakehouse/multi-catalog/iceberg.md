@@ -127,6 +127,29 @@ CREATE CATALOG iceberg PROPERTIES (
 "AWS_CREDENTIALS_PROVIDER" = "provider-class-name" // 可选，默认凭证类基于BasicAWSCredentials实现。
 ```
 
+#### Google Dataproc Metastore 作为元数据服务
+
+```sql
+CREATE CATALOG glue PROPERTIES (
+"type"="iceberg",
+"warehouse" = "gs://bucket/warehouse",
+"iceberg.catalog.type"="hms",
+"hive.metastore.uris" = "thrift://172.21.0.1:9083",
+"AWS_ENDPOINT" = "https://storage.googleapis.com",
+"AWS_REGION" = "us-east-1",
+"AWS_ACCESS_KEY" = "ak",
+"AWS_SECRET_KEY" = "sk",
+"use_path_style" = "true"
+);
+```
+
+`hive.metastore.uris`: Dataproc Metastore 服务开放的接口，在 Metastore 管理页面获取 ：[Dataproc Metastore Services](https://console.cloud.google.com/dataproc/metastore).
+
+`warehouse`:  Dataproc Metastore 的根路径，用于指定数据存放位置，就是 Dataproc Metastore 配置里的  `hive.metastore.warehouse.dir` 属性。
+
+属性详情参见 [Dataproc Metastore Docs](https://cloud.google.com/dataproc-metastore/docs/hive-metastore)
+
+
 ## 列类型映射
 
 和 Hive Catalog 一致，可参阅 [Hive Catalog](./hive.md) 中 **列类型映射** 一节。

@@ -77,6 +77,7 @@ public class FeConstants {
     public static String FS_PREFIX_S3A = "s3a";
     public static String FS_PREFIX_S3N = "s3n";
     public static String FS_PREFIX_OSS = "oss";
+    public static String FS_PREFIX_GCS = "gs";
     public static String FS_PREFIX_BOS = "bos";
     public static String FS_PREFIX_COS = "cos";
     public static String FS_PREFIX_OBS = "obs";
@@ -92,6 +93,7 @@ public class FeConstants {
         return location.startsWith(FeConstants.FS_PREFIX_S3)
                 || location.startsWith(FeConstants.FS_PREFIX_S3A)
                 || location.startsWith(FeConstants.FS_PREFIX_S3N)
+                || location.startsWith(FeConstants.FS_PREFIX_GCS)
                 || location.startsWith(FeConstants.FS_PREFIX_BOS)
                 || location.startsWith(FeConstants.FS_PREFIX_COS)
                 || location.startsWith(FeConstants.FS_PREFIX_OSS)
